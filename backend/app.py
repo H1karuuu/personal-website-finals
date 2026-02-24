@@ -12,7 +12,7 @@ CORS(app)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://rxztomvvwytetepornaq.supabase.co")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_9lzphqB_QLZDwDUKXAG0Rw_UoT5ckT9")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4enRvbXZ2d3l0ZXRlcG9ybmFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDA5NDYsImV4cCI6MjA4NzUxNjk0Nn0.FwDpjsfOSCV05maEhuEU7PSAJn09VW9z3L87x2vAeIE")
 
 # GitHub configuration
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME", "H1karuuu")
