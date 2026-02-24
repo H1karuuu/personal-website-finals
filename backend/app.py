@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from supabase import create_client, Client
 from dotenv import load_dotenv
 import os
 import requests as http_requests
@@ -13,11 +12,21 @@ CORS(app)
 # Supabase configuration
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://rxztomvvwytetepornaq.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4enRvbXZ2d3l0ZXRlcG9ybmFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDA5NDYsImV4cCI6MjA4NzUxNjk0Nn0.FwDpjsfOSCV05maEhuEU7PSAJn09VW9z3L87x2vAeIE")
+SUPABASE_REST_URL = f"{SUPABASE_URL}/rest/v1"
 
 # GitHub configuration
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME", "H1karuuu")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+def supabase_headers(prefer=None):
+    """Build headers for Supabase REST API calls."""
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
+    }
+    if prefer:
+        headers["Prefer"] = prefer
+    return headers
 
 
 @app.route("/")
@@ -66,8 +75,10 @@ def get_repos():
 def get_messages():
     """GET - Retrieve all guestbook messages, newest first."""
     try:
-        response = supabase.table("messages").select("*").order("created_at", desc=True).execute()
-        return jsonify(response.data), 200
+        url = f"{SUPABASE_REST_URL}/messages?select=*&order=created_at.desc"
+        resp = http_requests.get(url, headers=supabase_headers(), timeout=10)
+        resp.raise_for_status()
+        return jsonify(resp.json()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -86,14 +97,18 @@ def create_message():
         if not name or not email or not message:
             return jsonify({"error": "Name, email, and message are required."}), 400
 
-        # Insert into Supabase
-        response = supabase.table("messages").insert({
-            "name": name,
-            "email": email,
-            "message": message
-        }).execute()
+        # Insert into Supabase via REST API
+        url = f"{SUPABASE_REST_URL}/messages"
+        payload = {"name": name, "email": email, "message": message}
+        resp = http_requests.post(
+            url,
+            json=payload,
+            headers=supabase_headers(prefer="return=representation"),
+            timeout=10
+        )
+        resp.raise_for_status()
 
-        return jsonify(response.data), 201
+        return jsonify(resp.json()), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
