@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250" viewBox="0 0 250 250">
-  <circle cx="125" cy="125" r="125" fill="#111"/>
-  <circle cx="125" cy="100" r="45" fill="#ff0055"/>
-  <ellipse cx="125" cy="200" rx="65" ry="50" fill="#ff0055"/>
-  <text x="125" y="125" text-anchor="middle" fill="#000" font-size="16" font-family="Orbitron, sans-serif" font-weight="bold">JZ</text>
-</svg>

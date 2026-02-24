@@ -298,8 +298,8 @@
 </template>
 
 <script>
-import profileImage from '@/assets/Photo/Profile.jpg'
-import bannerImage from '@/assets/Photo/Banner.jpg'
+import profileImage from '@/assets/Photo/Profile.png'
+import bannerImage from '@/assets/Photo/header.gif'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
