@@ -45,6 +45,14 @@ body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+/* Portfolio wrapper – inherits light-mode CSS variables */
+.portfolio {
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;

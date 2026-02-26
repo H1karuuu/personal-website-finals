@@ -2,17 +2,15 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+import time
 import requests as http_requests
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins=[
-    "https://personal-website-finals-gamma-eight.vercel.app",
-    "https://*.vercel.app",
-    "http://localhost:5173",
-    "http://localhost:5000"
-], supports_credentials=True)
+
+# Allow all origins – this is a public portfolio API
+CORS(app)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://rxztomvvwytetepornaq.supabase.co")
@@ -21,6 +19,10 @@ SUPABASE_REST_URL = f"{SUPABASE_URL}/rest/v1"
 
 # GitHub configuration
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME", "H1karuuu")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+
+# Simple in-memory cache for GitHub repos (avoid rate limits)
+_repos_cache = {"data": None, "expires": 0}
 
 def supabase_headers(prefer=None):
     """Build headers for Supabase REST API calls."""
@@ -39,10 +41,25 @@ def home():
     return jsonify({"message": "Jayzee Portfolio API is running!", "status": "ok"})
 
 
+@app.after_request
+def add_cors_headers(response):
+    """Ensure CORS headers are always present on every response."""
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+
 @app.route("/api/repos", methods=["GET"])
 def get_repos():
-    """GET - Fetch public GitHub repositories for the user."""
+    """GET - Fetch public GitHub repositories (cached for 10 minutes)."""
+    global _repos_cache
     try:
+        # Return cached data if still fresh
+        now = time.time()
+        if _repos_cache["data"] is not None and now < _repos_cache["expires"]:
+            return jsonify(_repos_cache["data"]), 200
+
         url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
         params = {
             "sort": "updated",
@@ -51,6 +68,9 @@ def get_repos():
             "type": "owner"
         }
         headers = {"Accept": "application/vnd.github.v3+json"}
+        if GITHUB_TOKEN:
+            headers["Authorization"] = f"token {GITHUB_TOKEN}"
+
         resp = http_requests.get(url, params=params, headers=headers, timeout=10)
         resp.raise_for_status()
         repos = resp.json()
@@ -71,8 +91,13 @@ def get_repos():
                     "topics": repo.get("topics", [])
                 })
 
+        # Cache for 10 minutes
+        _repos_cache = {"data": result, "expires": now + 600}
         return jsonify(result), 200
     except Exception as e:
+        # If cache exists but expired, still return stale data with a warning
+        if _repos_cache["data"] is not None:
+            return jsonify(_repos_cache["data"]), 200
         return jsonify({"error": str(e)}), 500
 
 

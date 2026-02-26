@@ -521,8 +521,8 @@ export default {
     async fetchMessages() {
       this.isLoadingMessages = true
       try {
-        const res = await fetch(`${API_URL}/messages`)
-        if (!res.ok) throw new Error('Failed to fetch messages')
+        const res = await fetch(`${API_URL}/messages`, { mode: 'cors' })
+        if (!res.ok) throw new Error(`Failed to fetch messages: ${res.status}`)
         const data = await res.json()
         this.messages = data
       } catch (err) {
@@ -534,10 +534,13 @@ export default {
     async fetchRepos() {
       this.isLoadingRepos = true
       try {
-        const res = await fetch(`${API_URL}/repos`)
-        if (!res.ok) throw new Error('Failed to fetch repos')
+        const res = await fetch(`${API_URL}/repos`, { mode: 'cors' })
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}))
+          throw new Error(`Failed to fetch repos: ${res.status} ${errData.error || ''}`)
+        }
         const data = await res.json()
-        this.repos = data
+        this.repos = Array.isArray(data) ? data : []
       } catch (err) {
         console.error('Error fetching repos:', err)
       } finally {
@@ -583,6 +586,7 @@ export default {
       try {
         const res = await fetch(`${API_URL}/messages`, {
           method: 'POST',
+          mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: this.form.name,
@@ -590,7 +594,10 @@ export default {
             message: this.form.message
           })
         })
-        if (!res.ok) throw new Error('Failed to send message')
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}))
+          throw new Error(errData.error || `Server responded with ${res.status}`)
+        }
         this.submitStatus = 'Thank you for your message! 🎉'
         this.submitStatusClass = 'success'
         this.form = { name: '', email: '', message: '' }
