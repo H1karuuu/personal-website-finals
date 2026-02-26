@@ -1,5 +1,4 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify, make_response
 from dotenv import load_dotenv
 import os
 import time
@@ -8,9 +7,6 @@ import requests as http_requests
 load_dotenv()
 
 app = Flask(__name__)
-
-# Allow all origins – this is a public portfolio API
-CORS(app)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://rxztomvvwytetepornaq.supabase.co")
@@ -24,6 +20,7 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 # Simple in-memory cache for GitHub repos (avoid rate limits)
 _repos_cache = {"data": None, "expires": 0}
 
+
 def supabase_headers(prefer=None):
     """Build headers for Supabase REST API calls."""
     headers = {
@@ -36,26 +33,35 @@ def supabase_headers(prefer=None):
     return headers
 
 
+# ── CORS: add headers to EVERY response (including 404 and OPTIONS) ──
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    return response
+
+
+# Catch-all OPTIONS handler so preflight ALWAYS returns 200
+@app.route("/", defaults={"path": ""}, methods=["OPTIONS"])
+@app.route("/<path:path>", methods=["OPTIONS"])
+def handle_options(path):
+    response = make_response("", 200)
+    return response
+
+
 @app.route("/")
 def home():
     return jsonify({"message": "Jayzee Portfolio API is running!", "status": "ok"})
 
 
-@app.after_request
-def add_cors_headers(response):
-    """Ensure CORS headers are always present on every response."""
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    return response
-
-
+# ── REPOS (works at both /repos and /api/repos) ──
+@app.route("/repos", methods=["GET"])
 @app.route("/api/repos", methods=["GET"])
 def get_repos():
     """GET - Fetch public GitHub repositories (cached for 10 minutes)."""
     global _repos_cache
     try:
-        # Return cached data if still fresh
         now = time.time()
         if _repos_cache["data"] is not None and now < _repos_cache["expires"]:
             return jsonify(_repos_cache["data"]), 200
@@ -75,7 +81,6 @@ def get_repos():
         resp.raise_for_status()
         repos = resp.json()
 
-        # Return only relevant fields
         result = []
         for repo in repos:
             if not repo.get("fork", False):
@@ -91,16 +96,16 @@ def get_repos():
                     "topics": repo.get("topics", [])
                 })
 
-        # Cache for 10 minutes
         _repos_cache = {"data": result, "expires": now + 600}
         return jsonify(result), 200
     except Exception as e:
-        # If cache exists but expired, still return stale data with a warning
         if _repos_cache["data"] is not None:
             return jsonify(_repos_cache["data"]), 200
         return jsonify({"error": str(e)}), 500
 
 
+# ── MESSAGES (works at both /messages and /api/messages) ──
+@app.route("/messages", methods=["GET"])
 @app.route("/api/messages", methods=["GET"])
 def get_messages():
     """GET - Retrieve all guestbook messages, newest first."""
@@ -113,13 +118,13 @@ def get_messages():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/messages", methods=["POST"])
 @app.route("/api/messages", methods=["POST"])
 def create_message():
     """POST - Insert a new guestbook message."""
     try:
         data = request.get_json()
 
-        # Validate required fields
         name = data.get("name", "").strip()
         email = data.get("email", "").strip()
         message = data.get("message", "").strip()
@@ -127,7 +132,6 @@ def create_message():
         if not name or not email or not message:
             return jsonify({"error": "Name, email, and message are required."}), 400
 
-        # Insert into Supabase via REST API
         url = f"{SUPABASE_REST_URL}/messages"
         payload = {"name": name, "email": email, "message": message}
         resp = http_requests.post(
