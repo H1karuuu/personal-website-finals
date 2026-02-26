@@ -534,15 +534,44 @@ export default {
     async fetchRepos() {
       this.isLoadingRepos = true
       try {
+        // Try backend first
         const res = await fetch(`${API_URL}/repos`, { mode: 'cors' })
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}))
-          throw new Error(`Failed to fetch repos: ${res.status} ${errData.error || ''}`)
+          throw new Error(`Backend error: ${res.status} ${errData.error || ''}`)
         }
         const data = await res.json()
-        this.repos = Array.isArray(data) ? data : []
-      } catch (err) {
-        console.error('Error fetching repos:', err)
+        if (Array.isArray(data) && data.length > 0) {
+          this.repos = data
+          return
+        }
+        throw new Error('Empty result from backend')
+      } catch (backendErr) {
+        console.warn('Backend repos failed, falling back to GitHub API:', backendErr.message)
+        try {
+          // Fallback: fetch directly from GitHub API
+          const ghRes = await fetch(
+            'https://api.github.com/users/H1karuuu/repos?sort=updated&direction=desc&per_page=20&type=owner',
+            { headers: { Accept: 'application/vnd.github.v3+json' } }
+          )
+          if (!ghRes.ok) throw new Error(`GitHub API error: ${ghRes.status}`)
+          const ghData = await ghRes.json()
+          this.repos = ghData
+            .filter(r => !r.fork)
+            .map(r => ({
+              id: r.id,
+              name: r.name,
+              description: r.description,
+              html_url: r.html_url,
+              language: r.language,
+              stargazers_count: r.stargazers_count || 0,
+              forks_count: r.forks_count || 0,
+              updated_at: r.updated_at,
+              topics: r.topics || []
+            }))
+        } catch (ghErr) {
+          console.error('GitHub API fallback also failed:', ghErr)
+        }
       } finally {
         this.isLoadingRepos = false
       }
