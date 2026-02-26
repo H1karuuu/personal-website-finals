@@ -99,11 +99,13 @@
         <div class="section-content">
           <!-- Tech Stack Icons -->
           <div class="tech-stack">
-            <h3 class="tech-stack-title">Languages & Technologies</h3>
-            <div class="tech-stack-grid">
-              <div v-for="tech in techStack" :key="tech.name" class="tech-item">
-                <i :class="tech.icon" :style="{ color: tech.color }"></i>
-                <span class="tech-name">{{ tech.name }}</span>
+            <div v-for="group in techStack" :key="group.category" class="tech-stack-group">
+              <h3 class="tech-stack-title">{{ group.category }}</h3>
+              <div class="tech-stack-grid">
+                <div v-for="tech in group.items" :key="tech.name" class="tech-item">
+                  <i :class="tech.icon" :style="{ color: tech.color }"></i>
+                  <span class="tech-name">{{ tech.name }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -492,25 +494,45 @@ export default {
         }
       ],
       techStack: [
-        { name: 'Flutter', icon: 'devicon-flutter-plain', color: '#02569B' },
-        { name: 'Dart', icon: 'devicon-dart-plain', color: '#0175C2' },
-        { name: 'HTML', icon: 'devicon-html5-plain', color: '#E34F26' },
-        { name: 'CSS', icon: 'devicon-css3-plain', color: '#1572B6' },
-        { name: 'Java', icon: 'devicon-java-plain', color: '#ED8B00' },
-        { name: 'JavaScript', icon: 'devicon-javascript-plain', color: '#F7DF1E' },
-        { name: 'Node.js', icon: 'devicon-nodejs-plain', color: '#339933' },
-        { name: 'MySQL', icon: 'devicon-mysql-plain', color: '#4479A1' },
-        { name: 'MongoDB', icon: 'devicon-mongodb-plain', color: '#47A248' },
-        { name: 'React', icon: 'devicon-react-original', color: '#61DAFB' },
-        { name: 'Python', icon: 'devicon-python-plain', color: '#3776AB' },
-        { name: 'Git', icon: 'devicon-git-plain', color: '#F05032' },
-        { name: 'VS Code', icon: 'devicon-vscode-plain', color: '#007ACC' },
-        { name: 'Figma', icon: 'devicon-figma-plain', color: '#F24E1E' },
-        { name: 'Supabase', icon: 'devicon-supabase-plain', color: '#3ECF8E' },
-        { name: 'Vue.js', icon: 'devicon-vuejs-plain', color: '#4FC08D' },
-        { name: 'Vite', icon: 'devicon-vitejs-plain', color: '#646CFF' },
-        { name: 'Vercel', icon: 'devicon-vercel-original', color: '#ffffff' },
-        { name: 'Render', icon: 'devicon-render-plain', color: '#46E3B7' }
+        {
+          category: 'Languages',
+          items: [
+            { name: 'HTML', icon: 'devicon-html5-plain', color: '#E34F26' },
+            { name: 'CSS', icon: 'devicon-css3-plain', color: '#1572B6' },
+            { name: 'JavaScript', icon: 'devicon-javascript-plain', color: '#F7DF1E' },
+            { name: 'Java', icon: 'devicon-java-plain', color: '#ED8B00' },
+            { name: 'Python', icon: 'devicon-python-plain', color: '#3776AB' },
+            { name: 'Dart', icon: 'devicon-dart-plain', color: '#0175C2' },
+            { name: 'MySQL', icon: 'devicon-mysql-plain', color: '#4479A1' }
+          ]
+        },
+        {
+          category: 'Frameworks & Libraries',
+          items: [
+            { name: 'Vue.js', icon: 'devicon-vuejs-plain', color: '#4FC08D' },
+            { name: 'React', icon: 'devicon-react-original', color: '#61DAFB' },
+            { name: 'Flutter', icon: 'devicon-flutter-plain', color: '#02569B' },
+            { name: 'Node.js', icon: 'devicon-nodejs-plain', color: '#339933' }
+          ]
+        },
+        {
+          category: 'Tools',
+          items: [
+            { name: 'Git', icon: 'devicon-git-plain', color: '#F05032' },
+            { name: 'VS Code', icon: 'devicon-vscode-plain', color: '#007ACC' },
+            { name: 'Figma', icon: 'devicon-figma-plain', color: '#F24E1E' },
+            { name: 'Vite', icon: 'devicon-vitejs-plain', color: '#646CFF' }
+          ]
+        },
+        {
+          category: 'Platforms & Databases',
+          items: [
+            { name: 'MongoDB', icon: 'devicon-mongodb-plain', color: '#47A248' },
+            { name: 'Supabase', icon: 'devicon-supabase-plain', color: '#3ECF8E' },
+            { name: 'Vercel', icon: 'devicon-vercel-original', color: '#ffffff' },
+            { name: 'Render', icon: 'devicon-render-plain', color: '#46E3B7' }
+          ]
+        }
       ],
       form: {
         name: '',

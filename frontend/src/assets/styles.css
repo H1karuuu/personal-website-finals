@@ -552,15 +552,31 @@ body {
 
 /* Tech Stack Icons */
 .tech-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: calc(var(--spacing-unit) * 4);
   margin-bottom: calc(var(--spacing-unit) * 6);
+}
+
+.tech-stack-group {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 0, 85, 0.2);
+  padding: calc(var(--spacing-unit) * 3);
+  transition: all var(--transition-speed);
+}
+
+.tech-stack-group:hover {
+  border-color: var(--neon-red-dark);
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.15);
 }
 
 .tech-stack-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   color: var(--neon-red-dark);
   text-align: center;
-  margin-bottom: calc(var(--spacing-unit) * 4);
+  margin-bottom: calc(var(--spacing-unit) * 3);
 }
 
 .tech-stack-grid {
@@ -1168,6 +1184,7 @@ body {
 .light-mode .timeline-content,
 .light-mode .skill-category,
 .light-mode .tech-item,
+.light-mode .tech-stack-group,
 .light-mode .goal-card,
 .light-mode .repo-card,
 .light-mode .contact-method,
