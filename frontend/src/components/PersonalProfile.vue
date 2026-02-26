@@ -1,5 +1,5 @@
 <template>
-  <div class="portfolio">
+  <div class="portfolio" :class="{ 'light-mode': isLightMode }">
     <!-- Navigation -->
     <nav class="navbar">
       <div class="nav-container">
@@ -12,6 +12,12 @@
         <ul class="nav-menu" :class="{ active: isMenuOpen }">
           <li v-for="item in navItems" :key="item.id">
             <a :href="`#${item.id}`" class="nav-link" @click="closeMenu">{{ item.name }}</a>
+          </li>
+          <li>
+            <button class="theme-toggle" @click="toggleTheme" :aria-label="isLightMode ? 'Switch to dark mode' : 'Switch to light mode'">
+              <svg v-if="isLightMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
           </li>
         </ul>
       </div>
@@ -93,7 +99,7 @@
         <div class="section-content">
           <div class="skills-grid">
             <div v-for="category in skills" :key="category.title" class="skill-category">
-              <div class="skill-icon">{{ category.icon }}</div>
+              <div class="skill-icon" v-html="category.icon"></div>
               <h3>{{ category.title }}</h3>
               <ul class="skill-list">
                 <li v-for="skill in category.items" :key="skill">{{ skill }}</li>
@@ -111,7 +117,7 @@
         <div class="section-content">
           <div class="goals-container">
             <div v-for="goal in goals" :key="goal.title" class="goal-card">
-              <div class="goal-icon">{{ goal.icon }}</div>
+              <div class="goal-icon" v-html="goal.icon"></div>
               <h3>{{ goal.title }}</h3>
               <p>{{ goal.description }}</p>
             </div>
@@ -174,7 +180,7 @@
               <p>{{ contact.intro }}</p>
               <div class="contact-methods">
                 <div v-for="method in contact.methods" :key="method.title" class="contact-method">
-                  <div class="contact-icon">{{ method.icon }}</div>
+                  <div class="contact-icon" v-html="method.icon"></div>
                   <div class="contact-details">
                     <h4>{{ method.title }}</h4>
                     <p>{{ method.value }}</p>
@@ -301,13 +307,14 @@
 import profileImage from '@/assets/Photo/Profile.png'
 import bannerImage from '@/assets/Photo/header.gif'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_URL = import.meta.env.VITE_API_URL || 'https://jayzee-portfolio-api.onrender.com/api'
 
 export default {
   name: 'PersonalProfile',
   data() {
     return {
       isMenuOpen: false,
+      isLightMode: false,
       profileImage,
       bannerImage,
       isSubmitting: false,
@@ -369,7 +376,7 @@ export default {
       ],
       skills: [
         {
-          icon: '💻',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>',
           title: 'Technical Skills',
           items: [
             'Computer Hardware Assembly & Troubleshooting',
@@ -380,7 +387,7 @@ export default {
           ]
         },
         {
-          icon: '🎮',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>',
           title: 'Gaming & Strategy',
           items: [
             'Esports Gaming (Mobile & PC)',
@@ -390,7 +397,7 @@ export default {
           ]
         },
         {
-          icon: '🎯',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>',
           title: 'Personal Interests',
           items: [
             'Understanding Machine Parts',
@@ -403,32 +410,32 @@ export default {
       ],
       goals: [
         {
-          icon: '🔐',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
           title: 'Cybersecurity Firm',
           description: 'Start an IT firm specializing in cybersecurity solutions and protecting digital assets'
         },
         {
-          icon: '💼',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>',
           title: 'Financial Freedom',
           description: 'Achieve sustainable financial independence where resources enable dreams and opportunities'
         },
         {
-          icon: '❤️',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
           title: 'Family & Community',
           description: 'Provide for the people I cherish and create positive impact in my community'
         },
         {
-          icon: '🏆',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>',
           title: 'Industry Recognition',
           description: 'Become a notable figure in the IT industry through innovation and excellence'
         },
         {
-          icon: '🚀',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>',
           title: 'Business Growth',
           description: 'Build and grow a successful company that creates value and employment opportunities'
         },
         {
-          icon: '🎓',
+          icon: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>',
           title: 'Scholarship Achievement',
           description: 'Received NU SHS 50% Tuition Scholarship for academic excellence'
         }
@@ -436,9 +443,9 @@ export default {
       contact: {
         intro: "I'm always open to discussing new opportunities, collaborations, or just having a conversation about technology and innovation.",
         methods: [
-          { icon: '📧', title: 'Email', value: 'jzlopez@student.apc.edu.ph' },
-          { icon: '📱', title: 'Phone', value: '+63 945 334 4925' },
-          { icon: '📍', title: 'Location', value: 'Pasay City, Philippines' }
+          { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>', title: 'Email', value: 'jzlopez@student.apc.edu.ph' },
+          { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>', title: 'Phone', value: '+63 945 334 4925' },
+          { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>', title: 'Location', value: 'Pasay City, Philippines' }
         ]
       },
       resources: [
@@ -484,8 +491,17 @@ export default {
   mounted() {
     this.fetchMessages()
     this.fetchRepos()
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme === 'light') {
+      this.isLightMode = true
+    }
   },
   methods: {
+    toggleTheme() {
+      this.isLightMode = !this.isLightMode
+      localStorage.setItem('theme', this.isLightMode ? 'light' : 'dark')
+    },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen
     },
