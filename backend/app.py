@@ -7,7 +7,12 @@ import requests as http_requests
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "https://personal-website-finals-gamma-eight.vercel.app",
+    "https://*.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5000"
+], supports_credentials=True)
 
 # Supabase configuration
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://rxztomvvwytetepornaq.supabase.co")
